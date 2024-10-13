@@ -1,1 +1,57 @@
+Possible Interview Questions:
+1. How to create schema in PySpark?
+2. Other ways to create it?
+3. What is StructField and StructType in Schema?
+4. What if I have header in my data?
 
+
+Core Structure:
+DataFrameReader.format()\               -> Data file format(CSV, JSON, JDBC, ODBC, Table, Parquet)  -> OPTIONAL, IF NOT PASSED THEN DEFAULTS TO PARQUET
+               .option("key","value")\  -> InferSchema, Mode, Header -> OPTIONAL
+               .schema()\               -> We can pass manual scehma here -> OPTIONAL
+               .load()                  -> Path where our Data file exists -> NOT OPTIONAL
+
+------------DATAFRAMEREADER API------------
+|-> How to access?  => spark.read method lets us use DATAFRAMEREADER API
+
+Example: spark.read.format("CSV")\
+                  .option("header","true")\
+                  .option("inferschema","true")\
+                  .option("mode","FAILFAST")\
+                  .load("C:\User\Downloads\Data.CSV)
+
+------------MODE------------
+1. FailFast -> Fail execution if malformed record in dataset
+2. DropMalformed -> Drop the CORRUPTED record
+3. Permissive -> DEFAULT, it permits the record
+              -> Sets NULL value to all corrupted fields
+
+To check Schema of a DataFrame: df_name.printSchema()
+
+------------SCHEMA-----------
+
+2 ways to create
+|-> StructType,  StructField
+|-> DDL
+
+1. Using StructType and StructField:
+   from pyspark.sql.types import StructType, StructField
+StructType -> It defines Structure of our DataFrame
+              List/Collection of StructField
+              It is a CLASS
+e.g. - id | name | age
+      -----------------
+       1  | John | 26
+       2  | Mary | 23
+
+StructField -> Columns are our field and they are of type Structure, therefore StructField
+               Data type of column, if column is NULLABLE, all these informations are contained here
+
+Example: 
+my_schema = StructType([
+                        StructField("Id",IntegerType(),True),
+                        StructField("Name",StringType(),True),
+                        StructField("Age",IntegerType(),True),
+                        ])
+2. Using DDL:
+ddl_my_schema = "Id integer, Name string, Age integer"
