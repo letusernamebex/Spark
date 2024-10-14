@@ -1,1 +1,27 @@
+Potential Interview Questions:
+1. Have you worked with corrupted records?
+2. When do you say that its corrupted record?
+3. What happens when we encounter corrupted records in different read mode?
+4. How can we print bad records?
+5. Where do you store corrupted records and how can we access it later?
 
+
+---------When do you say that its corrupted record----------
+
+> Commonly occurs in CSV, JSON file formats.
+> Eg.- In JSON, a Key-Value Pair is not closed. Or, in CSV, we have a comma in a data record(in address field)
+
+---------What happens when we encounter corrupted records in different read mode-----------
+
+> In PERMISSIVE, we will have all the records with corrupted records set to NULL
+> In DROPMALFORMED, we will have (total records-malformed records)
+> In FAILFAST, we will have 0 records
+
+----------How can we print bad records---------------
+
+> Create a schema of your own
+> Create an extra column for your corrupted data (_corrupt_record)
+
+-------store corrupted records-------------
+
+> Use option("badRecordsPath","file_location")
