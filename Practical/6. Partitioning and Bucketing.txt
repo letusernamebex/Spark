@@ -1,1 +1,24 @@
-hvhy
+Partitioning:
+
+df.write.format("CSV")\
+        .option("header","true")\
+        .option("mode","overwrite")\
+        .option("path",".....")\
+        .partitionBy("col_to_partition")\
+        .save()
+
+df.write.format("CSV")\
+        .option("header","true")\
+        .option("mode","overwrite")\
+        .option("path",".....")\
+        .partitionBy("col1_to_partition","col2_to_partition")\
+        .save()
+
+df.write.format("CSV")\
+        .option("header","true")\
+        .option("mode","overwrite")\
+        .option("path",".....")\
+        .bucketBy(no_of_buckets,"col_to_bucket")\
+        .saveAsTable("table_name")             #save throws error as it's not supported
+
+
