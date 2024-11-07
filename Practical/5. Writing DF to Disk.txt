@@ -1,0 +1,31 @@
+Potential Interview Questions:
+1. What are the modes available in DF writer?
+2. What is partitionBy and bucketBy?
+3. How to write data into multiple partitions?
+
+General Structure of DF Writer API:
+
+DataFrameWriter.format()\
+               .option()\
+               .partitionBy()\
+               .bucketBy()\
+               .save()
+
+df.write.format("CSV")\
+        .option("header","true")\
+        .option("mode","overwrite")\
+        .option("path",".....")\            # path can be given in either option or save
+        .save()
+
+Modes:
+1. Append
+2. Overwrite
+3. errorIfExists -> if file is there, throw error
+4. Ignore -> it ignores the write if file exists in path
+
+df.repartition(k)write.format("CSV")\       # repartition the single file in k files
+        .option("header","true")\
+        .option("mode","overwrite")\
+        .option("path",".....")\            
+        .save()
+
