@@ -115,4 +115,4 @@ Row group 1 age min:10 max:17 -> row group selected
 Row group 2 age min:22 max:35 -> row group discarded, not scanned
 .............................
 Row group 1000 age min:40 max:60 -> row group discarded, not scanned
-•We get advantage of both Predicate Pushdown(data is not scanned on row group level) and Projection Pruning(columns not required are not scanned)
+•We get advantage of both Predicate Pushdown(data is not scanned on row group level) and Projection Pruning(columns not required are not scanned) ##### Reduces I/O
