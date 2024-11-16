@@ -1,1 +1,32 @@
-hbh
+•Potential Interview Questions:
+1. What is JSON data and how to read it in Spark?
+2. What if I have 3 keys in all line and 4 key in one line?
+3. What is multiline and line-delimited JSON?
+4. Which one works faster - multiline or line-delimited? -> line-delimited
+5. How to convert nested JSON into Spark dataframe? ----important
+6. What will happen if I have corrupted JSON file or invalid JSON file? -> In case of corrupted record, Spark will create a column "_corrupt_record" and show that corrupted record and in case of invalid JSON it throws error
+
+-------------JSON----------------
+• JavaScript Object Notation -> Looks like JS object
+• Key-Value pair data
+• Eg,: { "id":1,"name":"Manish","age":26},
+       { "id":2,"name":"Vikash","age":21}
+• Flexible as it is semi-structured
+• Spark performs better on LINE DELIMITED JSON -> important
+• We have to enable MULTI LINE JSON in Spark
+• In multi line JSON, we have to consider the whole file as an object where we have to parse to 
+  find where the line ends
+
+---------- Reading line delimited JSON -------------------
+spark.read.format("json")\
+                  .option("inferschema","true")\
+                  .option("mode","PERMISSIVE")\
+                  .load("/FileStore/tables/line_delimited_json.json").show()
+
+---------- Reading multiline JSON -------------------
+spark.read.format("json")\
+                  .option("inferschema","true")\
+                  .option("mode","PERMISSIVE")\
+                  .option("multiline","true")\    # Neeed to enable multiline option
+                  .load("/FileStore/tables/multiline_correct.json").show()
+
