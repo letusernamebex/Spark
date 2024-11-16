@@ -1,0 +1,118 @@
+Potential Interview Questions:
+1. What is Parquet file format?
+2. Why is it needed?
+3. Reading a Parquet file
+4. Why is it the default choice?
+5. What encoding is done on data?
+6. What compression technique is used?
+7. How to optimize parquet file?
+
+
+----------- Parquet File Format --------------
+• Columnar based file format -> Hybrid between Row & Columnar(ref. line 60)
+• Binary file format -> Not possible to read normally
+• Structured file format
+
++---+--------+------+
+|age|    name|salary|
++---+--------+------+
+| 20|  Manish| 20000|
+| 25|  Nikita| 21000|
+| 16|  Pritam| 22000|
++---+--------+------+
+
+• Row Oriented on Disk: Whole row is stored in continuous format
++---+--------+------++---+--------+------++---+--------+------+
+|age|    name|salary||age|    name|salary||age|    name|salary|
++---+--------+------++---+--------+------++---+--------+------+
+| 20|  Manish| 20000|| 25|  Nikita| 21000|| 16|  Pritam| 22000|
++---+--------+------++---+--------+------++---+--------+------+
+
+• Column Oriented on Disk: Whole column is stored in continuous format
+|20|25|16|| Manish| Nikita | Pritam||20000|21000|22000|
++---------+-------------------------+-----------------+
+|      age|                     name|           salary|
++---------+-------------------------+-----------------+
+
+• Big Data is WRITE ONCE, READ MANY -> Most of the time we are not reading all the columns but few columns. Let's say we need age and salary only, in Row oriented it will jump from one record to another as required column values are not continuous whereas in Columnar they are stored in continuous blocks.
+
+• Row based are used in OLTP applicatons
+
++----------------------------------+----------------------------------+
+|                              OLAP|                              OLTP|
++----------------------------------+----------------------------------+
+|-> Read few columns               |-> Write rows(Insert,Update,Delete|
+|-> Columnar file format used      |-> Row file format used           |
++----------------------------------+----------------------------------+
+
+
+• Reading Parquet File:
+df=spark.read.parquet("/FileStore/tables/part_r_00000_1a9822ba_b8fb_4d8e_844a_ea30d0801b9e_gz.parquet")
+df.show()
+### We don't need to give other options as Parquet has lots of METADATA to decide those
+
+------- Storing data in columnar format also has issues---------------
+- Let's say we have a 100 GB table with 10 rows, i.e. each row is of 10 GB. 
+- We want to read Col1, Col2 and Col10. 
+- Reading Col1 and Col2 is easy as we don't have to scan all the columns.
+--> But, as soon as we go tom read Col10, we need to scan all the remaining columns even though we don't want their data. -> We get stuck into the same thing as Row based format
+
+*****Parquet resolves this by using a HYBRID approach between ROW and COLUMNAR formats:*****
+• Columnar data is divided into HORIZONTAL/VERTICAL breaks
+• Let's say we have 100 million records, we will take BREAKS after each 100K records
+  A0,A1,A2,.......A99999,
+  B0,B1,B2,.......B99999,
+  C0,C1,C2,.......C99999,
+  .......................
+  .......................
+  .......................
+  J0,J1,J2,.......J99999
+
+• Now here we can read data from first 100K records as needed.
+
+***How Parquet file looks like***
+File
+|-> Row Group 0 (metadata is presnt at group level also)
+  |-> Column A
+    |-> Page 0 (stores actual data)
+       |-> Metadata
+           |-> min, max, count
+       |-> Values
+    |-> Page 1
+  |-> Column B
+|-> Row Group 1
+
+• It has tree like structure
+• Row groups are group of columns(like in above example) and have a default size of 128 Mb
+
+---------------------------------------------------------------------------------------------
+
+• RLE - Run Length Encoding -> eg.- aaabbbbbccd -> a3b5c2d1
+• BIT Packed -> Checks what is the max byte storage is needed to store the data(4 byte or 8 or 2)
+• GZIP Compression
+• Plain Encoding
+
+1. Uncompressed Data(might have duplicate values) - Akash, Ravi, Ravi, Sumit, Sumit, Sumit, Nitya, 
+   Atul, Akash
+                |
+2. Picks distinct values from it and created a dictionary from it {0: "Akash", 1: "Nitya", 2: 
+   "Ravi", 3: "Sumit", 4: "Atul"}
+   Creates Dictionary encoded data - 0,2,2,3,3,3,1,4,0
+                | RLE + Bit Packing
+3. {0: "Akash", 1: "Nitya", 2: "Ravi", 3: "Sumit", 4: "Atul"}
+   RLE + Bit Packed Dictionary encoded data - 0 2,2 3,3 1 4 0
+4. Compression runs on top of it
+
+---------------------------------------------------------------------------------------------
+
+How file structure helps in OPTIMIZATION
+
+Example: select * from table where age<18
+•We have 1.4 Billion(1400 million) records
+•Since we have ROW GROUP LEVEL METADATA, we have 1000 Row groups
+Row group 0 age min:5 max:25 -> row group selected
+Row group 1 age min:10 max:17 -> row group selected
+Row group 2 age min:22 max:35 -> row group discarded, not scanned
+.............................
+Row group 1000 age min:40 max:60 -> row group discarded, not scanned
+•We get advantage of both Predicate Pushdown(data is not scanned on row group level) and Projection Pruning(columns not required are not scanned)
