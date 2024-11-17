@@ -11,18 +11,19 @@ DataFrameWriter.format()\
                .bucketBy()\
                .save()
 
-df.write.format("CSV")\
-        .option("header","true")\
-        .option("mode","overwrite")\
-        .option("path",".....")\            # path can be given in either option or save
-        .save()
+Example: df.write.format("CSV")\
+           .option("header","true")\
+           .option("mode","overwrite")\
+           .option("path",".....")\            # path can be given in either option or save
+           .save()
 
-Modes:
-1. Append
-2. Overwrite
+• Modes:
+1. Append -> If we write a new file and older file already exists, it will append the new file
+2. Overwrite -> If old file exists and we try to write a new file, older file will be deleted and new file is written
 3. errorIfExists -> if file is there, throw error
 4. Ignore -> it ignores the write if file exists in path
 
+• Partitioning a file while writing to a disk
 df.repartition(k)write.format("CSV")\       # repartition the single file in k files
         .option("header","true")\
         .option("mode","overwrite")\
