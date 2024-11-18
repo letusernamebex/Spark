@@ -1,4 +1,11 @@
-Partitioning:
+Potential interview questions:
+1. What is partitioning in Spark?
+2. What is bucketing in Spark?
+3. Why both are needed?
+4. When to use partitioning?
+5. When to use bucketing?
+
+Partitioning: Using partitionBy()
 
 df.write.format("CSV")\
         .option("header","true")\
