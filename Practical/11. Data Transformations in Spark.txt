@@ -1,0 +1,57 @@
+1. What is Schema?
+2. What is DataFrame?
+3. How to select columns?
+4. Ways to select columns
+5. What is expression?
+
+• Schema -> Column Name + Column Data Type
+  eg. - df.printSchema()
+        df.columns()
+
+• DataFrame -> Rows + Columns
+
++---+--------+------+
+|age|    name|salary|
++---+--------+------+
+| 20|  Manish| 20000| -> A Byte
+| 25|  Nikita| 21000| -> A Byte
+| 16|  Pritam| 22000| -> A Byte
++---+--------+------+
+
+  -> When DF is stored in memory, it is stored as a Row() type object
+  -> This means a whole row is converted into a Byte format and then stored
+
+  Creating Row: row=Row(22,"Akash",15000)  # PySpark syntax to add a row
+
+  • Columns: Columns are expressions i.e. set of transformations on one or more than one values in a record
+  eg.- df.select(col("age")+5) -> all age values are increased by 5
+
+  • Multiple ways to select columns:
+  1. String method -> employee_df.select("name").show()
+  2. Column method -> Using col() function -> employee_df.select(col("name")).show() 
+                   -> col() function will convert "name" string to a column
+  
+  --- Why do we need Column method?
+  -> Let's say we want to add 5 to all the values in ID column, in this case STRING method will give ANALYSIS EXCEPTION error,
+    employee_df.select("id+5").show() as "id+5" column doesn't exist is Catalog. So, we will use Column method
+    employee_df.select(col("id")+5).show()
+
+Selecting multiple columns:
+  1. String method -> employee_df.select("id", "name", "age").show()
+  2. Column method -> employee_df.select(col("id"), col("name"), col("age")).show()
+  3. Using SQUARE brackets -> Helpful while doing JOINS -> employee_df.select(employee_df["salary"]).show()
+  4. Usinf df.col method -> Helpful while doing JOINS -> employee_df.select(employee_df.address).show()
+
+
+---------------- EXPRESSION ---------------
+employee_df.select(expr("id+5")).show() -> Here, expr() is converting "id+5" into column method. It takes "id", does +5 on it and then converts it into column and passes to select
+
+-> We csn give SQL like statements in expr()
+  eg. - employee_df.select(expr("id as employee_id"), expr("name as employee_name"), expr("concat(name,address)")).show()
+
+-------------- Using Spark SQL -------------------
+-> We will create a Temporary table/view to use Spark SQL.
+eg. - employee_df.createOrReplaceTempView("employee_tbl")
+      spark.sql("""
+          select * from employee_tbl
+          """).show()  # Triple quotes to help write multi-line queries
