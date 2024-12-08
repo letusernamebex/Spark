@@ -1,0 +1,8 @@
+ • Aliasing:
+   Using .alias() method -> employee_df.select(col("id").alias("employee_id"),"name","age").show()
+
+• Filter/Where:
+  Using either of .filter() or .where() method, both are same
+  -> employee_df.filter(col("salary")>150000).show()
+  -> While using multiple filter conditions, we have to close the conditions in parentheses properly
+     employee_df.filter((col("salary")>150000) & (col("age")<18)).show()
