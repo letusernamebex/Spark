@@ -43,8 +43,9 @@ Selecting multiple columns:
   4. Usinf df.col method -> Helpful while doing JOINS -> employee_df.select(employee_df.address).show()
 
 
----------------- EXPRESSION ---------------
-employee_df.select(expr("id+5")).show() -> Here, expr() is converting "id+5" into column method. It takes "id", does +5 on it and then converts it into column and passes to select
+#####---------------- EXPRESSION ---------------#####
+employee_df.select(expr("id+5")).show() -> Here, expr() is converting "id+5" into column method. It takes "id", does +5 on it and then converts it into
+column and passes to select
 
 -> We csn give SQL like statements in expr()
   eg. - employee_df.select(expr("id as employee_id"), expr("name as employee_name"), expr("concat(name,address)")).show()
