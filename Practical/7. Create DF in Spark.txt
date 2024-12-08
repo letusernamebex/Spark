@@ -1,0 +1,7 @@
+DE Pipeline:
+
+Read ----------> Transform ----------> Write ---> BI/DA
+                   |-> Dataframe API   # Two methods for doing Transformations
+                   |-> Spark SQL
+
+df_name = spark.createDataFrame(data=my_data, schema=my_schema) # Here, data and schema are arguments for spark.createDataFrame() 
