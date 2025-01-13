@@ -6,3 +6,32 @@
   -> employee_df.filter(col("salary")>150000).show()
   -> While using multiple filter conditions, we have to close the conditions in parentheses properly
      employee_df.filter((col("salary")>150000) & (col("age")<18)).show()
+
+• Literal:
+  If we want to create a column and want all rows to have same values, in that case we use literal.
+  We use lit("literal_value") with .alias("col_name") to do proper column naming
+  -> employee_df.select(*,lit("kumar").alias("last_name")).show()
+
+• Adding columns:
+  Using withColumn we can manipulate an existing column or we can create a new column
+  -> employee_df.withColumn("sur_name",lit("singh")).show()
+
+• Renaming column:
+  Using with withColumnRenamed()
+  -> employee_df.withColumnRenamed("id","employee_id").show()
+
+• Casting data type:
+  Using withColumn()
+  -> employee_df.withColumn("id", col("id").cast("string"))\
+                .withColumn("salary", col("salary").cast("long"))\
+                .printSchema()
+
+• Removing column:
+  Using .drop()
+  -> employee_df.drop("id", col("name")).show()
+
+******** Using SPARK SQL ********
+
+• spark.sql("""
+          select *, "kumar" as last_name from employee_tbl where salary>150000 and age<18
+          """).show()
